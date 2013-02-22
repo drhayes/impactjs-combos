@@ -7,7 +7,7 @@
   "keywords": [
     "impactjs"
   ],
-  "main": "./eventChain.js",
+  "main": "./comboManager.js",
   "engines": {
     "node": "*"
   },

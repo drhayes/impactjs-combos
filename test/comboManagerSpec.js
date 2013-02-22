@@ -15,10 +15,6 @@ global._ = _;
 
 // Fake the Impact global namespace with good enough definitions.
 var ig = global.ig = {
-  // Properties used by eventChain.
-  system: {
-    tick: 0
-  },
   // Impact module definition stuff.
   module: function() {
     return this;
