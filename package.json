@@ -23,6 +23,9 @@
       "type": "MIT"
     }
   ],
+  "dependencies": {
+    "underscore": "*"
+  },
   "devDependencies": {
     "chai": "*",
     "mocha": "*",
