@@ -114,9 +114,22 @@ describe('ComboManager', function() {
       });
 
       describe('with one combo', function() {
+        var handle;
+
         beforeEach(function() {
-          comboManager.add(moves, 1000, cb);
+          handle = comboManager.add(moves, 1000, cb);
           ig.input.pressed = sinon.stub();
+        });
+
+        it('should not check if no registered combos', function() {
+          // Remove the combo registered in beforeEach.
+          // We need to make sure we're not iterating over a bunch
+          // of combo starters if no combos are registered.
+          comboManager.remove(handle);
+          // Now invoke update.
+          comboManager.update();
+          // Validate that our stub was not called.
+          expect(ig.input.pressed.called).to.not.be.ok;
         });
 
         it('should check that first move was pressed', function() {
