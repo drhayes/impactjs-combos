@@ -1,4 +1,4 @@
-/*global ig: true */
+/*global ig: true, _: true */
 ig.module(
   'game.system.comboManager'
 )
@@ -10,15 +10,20 @@ ig.module(
   'use strict';
 
   global.ComboManager = function() {
-    var handleId = 0;
-
-    var genHandle = function() {
-      return 'combo-manager-' + handleId++;
-    };
+    this.combos = {};
 
     this.add = function(moves, interval, callback) {
-      var handle = genHandle();
+      var handle = _.uniqueId('combo-manager-');
+      this.combos[handle] = {
+        moves: moves,
+        interval: interval,
+        callback: callback
+      };
       return handle;
+    };
+
+    this.remove = function(handle) {
+      delete this.combos[handle];
     };
   };
 
