@@ -1,0 +1,34 @@
+{
+  "name": "impactjs-combos",
+  "version": "0.1.0",
+  "description": "Utility to provide combos in ImpactJS.",
+  "homepage": "https://github.com/drhayes/impactjs-combos",
+  "author": "David Hayes <drhayes@gmail.com> (http://davidrhayes.com)",
+  "keywords": [
+    "impactjs"
+  ],
+  "main": "./eventChain.js",
+  "engines": {
+    "node": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drhayes/impactjs-combos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/drhayes/impactjs-combos/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*",
+    "sinon-chai": "*"
+  },
+  "scripts": {
+    "test": "make test"
+  }
+}
