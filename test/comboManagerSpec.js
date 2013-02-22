@@ -15,6 +15,9 @@ global._ = _;
 
 // Fake the Impact global namespace with good enough definitions.
 var ig = global.ig = {
+  input: {
+    pressed: function() {}
+  },
   // Impact module definition stuff.
   module: function() {
     return this;
@@ -108,6 +111,22 @@ describe('ComboManager', function() {
     describe('update', function() {
       it('should be a function', function() {
         expect(comboManager.update).to.be.a('function');
+      });
+
+      describe('with one combo', function() {
+        beforeEach(function() {
+          comboManager.add(moves, 1000, cb);
+          ig.input.pressed = sinon.stub();
+        });
+
+        it('should check that first move was pressed', function() {
+          // This fakes the input press.
+          ig.input.pressed.withArgs(moves[0]).returns(true);
+          // Invoke update.
+          comboManager.update();
+          // Validate that our stub was called.
+          expect(ig.input.pressed.called).to.be.ok;
+        });
       });
     });
   });

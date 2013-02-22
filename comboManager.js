@@ -56,6 +56,9 @@ ig.module(
 
     this.update = function() {
       // Iterate through the known combo starters.
+      _.each(this.comboStarters, function(comboStarter, firstMove) {
+        if (ig.input.pressed(firstMove)) {}
+      });
     };
   };
 
