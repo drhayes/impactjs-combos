@@ -37,7 +37,7 @@ describe('ComboManager', function() {
     });
   });
 
-  describe('usage', function() {
+  describe('method', function() {
     var comboManager;
     var moves = ['up', 'up', 'down', 'down'];
     var cb;
@@ -62,6 +62,23 @@ describe('ComboManager', function() {
         var handle = comboManager.add(moves, 1000, cb);
         expect(_.size(comboManager.combos)).to.equal(1);
       });
+
+      it('should track a new combo starter', function() {
+        expect(_.size(comboManager.comboStarters)).to.equal(0);
+        comboManager.add(['left'], 1000, cb);
+        expect(_.size(comboManager.comboStarters)).to.equal(1);
+        expect(comboManager.comboStarters.left).to.be.ok;
+      });
+
+      it('should track duplicate combo starters', function() {
+        expect(_.size(comboManager.comboStarters)).to.equal(0);
+        comboManager.add(['left', 'right'], 1000, cb);
+        comboManager.add(['left', 'up'], 1000, cb);
+        expect(_.size(comboManager.comboStarters)).to.equal(1);
+        expect(comboManager.comboStarters.left).to.be.ok;
+        var starters = comboManager.comboStarters.left;
+        expect(starters).to.have.length(2);
+      });
     });
 
     describe('remove', function() {
@@ -78,6 +95,19 @@ describe('ComboManager', function() {
 
       it('should not blow up if given invalid handle', function() {
         comboManager.remove('thing');
+      });
+
+      it('should stop tracking combo starter if removed', function() {
+        var handle = comboManager.add(moves, 1000, cb);
+        expect(_.size(comboManager.comboStarters)).to.equal(1);
+        comboManager.remove(handle);
+        expect(_.size(comboManager.comboStarters)).to.equal(0);
+      });
+    });
+
+    describe('update', function() {
+      it('should be a function', function() {
+        expect(comboManager.update).to.be.a('function');
       });
     });
   });
