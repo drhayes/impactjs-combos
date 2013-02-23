@@ -15,9 +15,12 @@ global._ = _;
 
 // Fake the Impact global namespace with good enough definitions.
 var ig = global.ig = {
+  // Fake input stuff.
   input: {
     pressed: function() {}
   },
+  // Fake Timer stuff.
+  Timer: function() {},
   // Impact module definition stuff.
   module: function() {
     return this;
@@ -44,10 +47,20 @@ describe('ComboManager', function() {
     var comboManager;
     var moves = ['up', 'up', 'down', 'down'];
     var cb;
+    var deltaStub;
 
     beforeEach(function() {
+      // Fake the timer as well.
+      deltaStub = sinon.stub();
+      sinon.stub(ig, 'Timer').returns({
+        delta: deltaStub
+      });
       comboManager = new ComboManager();
       cb = sinon.spy();
+    });
+
+    afterEach(function() {
+      ig.Timer.restore();
     });
 
     describe('add', function() {
@@ -161,6 +174,10 @@ describe('ComboManager', function() {
           comboManager.update();
           // Do we have a new tracker?
           expect(_.size(comboManager.trackers)).to.equal(2);
+        });
+
+        it('expires old timers during update', function() {
+           // test!
         });
       });
     });

@@ -14,6 +14,15 @@ ig.module(
     this.comboStarters = {};
     this.trackers = {};
 
+    this.timer = new ig.Timer();
+
+    // Register a combo with the combo manager. 'moves' is an array of inputs
+    // that, pressed in succession, represent a combo. 'interval' is the time
+    // in seconds that the player has to make the combo; for example, with an
+    // interval of 1.5 the player has 1.5 seconds from the first keypress to
+    // the last to complete the combo. 'callback' is invoked if the combo
+    // completes successfully.
+    // Returns a handle that you can use to remove a combo afterwards.
     this.add = function(moves, interval, callback) {
       var handle = _.uniqueId('combo-manager-');
       // Register the combo itself.
@@ -35,6 +44,8 @@ ig.module(
       return handle;
     };
 
+    // Invoke this method with the handle returned by add to de-register
+    // a combo.
     this.remove = function(handle) {
       // Which combo are we removing?
       var combo = this.combos[handle];
@@ -55,19 +66,27 @@ ig.module(
       delete this.combos[handle];
     };
 
+    // Meant to execute within the context of a ComboManager instance.
+    // Given a list of combo handles and the first move for each, check
+    // if the corresponding input was pressed and, if so, create a new tracker.
+    var maybeCreateTrackers = function(handles, firstMove) {
+      if (ig.input.pressed(firstMove)) {
+        // Add a new tracker for each handle.
+        _.each(handles, function(handle) {
+          var trackerId = _.uniqueId('tracker-');
+          this.trackers[trackerId] = {
+            handle: handle,
+            timestamp: this.timer.delta()
+          };
+        }, this);
+      }
+    };
+
+    // Call this method every frame to check for combos!
     this.update = function() {
-      // Iterate through the known combo starters.
-      _.each(this.comboStarters, function(handles, firstMove) {
-        if (ig.input.pressed(firstMove)) {
-          // Add a new tracker for each handle.
-          _.each(handles, function(handle) {
-            var trackerId = _.uniqueId('tracker-');
-            this.trackers[trackerId] = {
-              handle: handle
-            };
-          }, this);
-        }
-      }, this);
+      // Did the player press any keys that we should track as possible combos?
+      _.each(this.comboStarters, maybeCreateTrackers, this);
+      // Have any trackers expired?
     };
   };
 
