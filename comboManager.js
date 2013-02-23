@@ -82,11 +82,19 @@ ig.module(
       }
     };
 
+    var filterExpiredTracker = function(tracker, trackerId) {
+      var interval = this.combos[tracker.handle].interval;
+      if (this.timer.delta() - tracker.timestamp > interval) {
+        delete this.trackers[trackerId];
+      }
+    };
+
     // Call this method every frame to check for combos!
     this.update = function() {
       // Did the player press any keys that we should track as possible combos?
       _.each(this.comboStarters, maybeCreateTrackers, this);
       // Have any trackers expired?
+      _.each(this.trackers, filterExpiredTracker, this);
     };
   };
 

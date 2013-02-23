@@ -128,9 +128,12 @@ describe('ComboManager', function() {
 
       describe('with one combo', function() {
         var handle;
+        var interval;
 
         beforeEach(function() {
-          handle = comboManager.add(moves, 1000, cb);
+          deltaStub.returns(0);
+          interval = 0.5;
+          handle = comboManager.add(moves, interval, cb);
           ig.input.pressed = sinon.stub();
         });
 
@@ -166,7 +169,7 @@ describe('ComboManager', function() {
 
         it('should add a tracker for each combo matched', function() {
           // Add another combo.
-          comboManager.add([moves[0], 'jump'], 1000, cb);
+          comboManager.add([moves[0], 'jump'], interval, cb);
           // Fake the input press.
           ig.input.pressed.withArgs(moves[0]).returns(true);
           expect(_.size(comboManager.trackers)).to.equal(0);
@@ -177,7 +180,15 @@ describe('ComboManager', function() {
         });
 
         it('expires old timers during update', function() {
-           // test!
+           // Fake the input press.
+           ig.input.pressed.withArgs(moves[0]).returns(true);
+           // Invoke update to create a tracker.
+           comboManager.update();
+           expect(_.size(comboManager.trackers)).to.equal(1);
+           deltaStub.returns(interval * 2);
+           ig.input.pressed.withArgs(moves[0]).returns(false);
+           comboManager.update();
+           expect(_.size(comboManager.trackers)).to.equal(0);
         });
       });
     });
