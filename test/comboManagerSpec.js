@@ -140,6 +140,28 @@ describe('ComboManager', function() {
           // Validate that our stub was called.
           expect(ig.input.pressed.called).to.be.ok;
         });
+
+        it('should create a new tracker when matching the first move', function() {
+          // Fake the input press.
+          ig.input.pressed.withArgs(moves[0]).returns(true);
+          expect(_.size(comboManager.trackers)).to.equal(0);
+          // Invoke update.
+          comboManager.update();
+          // Do we have a new tracker?
+          expect(_.size(comboManager.trackers)).to.equal(1);
+        });
+
+        it('should add a tracker for each combo matched', function() {
+          // Add another combo.
+          comboManager.add([moves[0], 'jump'], 1000, cb);
+          // Fake the input press.
+          ig.input.pressed.withArgs(moves[0]).returns(true);
+          expect(_.size(comboManager.trackers)).to.equal(0);
+          // Invoke update.
+          comboManager.update();
+          // Do we have a new tracker?
+          expect(_.size(comboManager.trackers)).to.equal(2);
+        });
       });
     });
   });

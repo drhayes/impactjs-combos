@@ -12,6 +12,7 @@ ig.module(
   global.ComboManager = function() {
     this.combos = {};
     this.comboStarters = {};
+    this.trackers = {};
 
     this.add = function(moves, interval, callback) {
       var handle = _.uniqueId('combo-manager-');
@@ -56,9 +57,17 @@ ig.module(
 
     this.update = function() {
       // Iterate through the known combo starters.
-      _.each(this.comboStarters, function(comboStarter, firstMove) {
-        if (ig.input.pressed(firstMove)) {}
-      });
+      _.each(this.comboStarters, function(handles, firstMove) {
+        if (ig.input.pressed(firstMove)) {
+          // Add a new tracker for each handle.
+          _.each(handles, function(handle) {
+            var trackerId = _.uniqueId('tracker-');
+            this.trackers[trackerId] = {
+              handle: handle
+            };
+          }, this);
+        }
+      }, this);
     };
   };
 
