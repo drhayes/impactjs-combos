@@ -203,7 +203,7 @@ describe('ComboManager', function() {
            ig.input.pressed.withArgs(moves[2]).returns(false);
            ig.input.pressed.withArgs(moves[3]).returns(true);
            comboManager.update();
-           expect(cb.called).to.be(true);
+           expect(cb.called).to.equal(true);
         });
       });
     });

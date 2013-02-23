@@ -86,10 +86,28 @@ ig.module(
     // Given a tracker (and its ID) this method will remove it from the
     // global list if that tracker has expired according to the
     // ComboManager's timer.
-    var filterExpiredTracker = function(tracker, trackerId) {
+    // It will then check the tracker's current index and see if that
+    // input has been pressed. If so, the index will be advanced.
+    // If the index is greater than the length of the matching combo's moves
+    // then this combo has fired.
+    var processTracker = function(tracker, trackerId) {
       var interval = this.combos[tracker.handle].interval;
       if (this.timer.delta() - tracker.timestamp > interval) {
         delete this.trackers[trackerId];
+        return;
+      }
+      var index = tracker.index;
+      if (index === void 0) {
+        index = 0;
+      }
+      var combo = this.combos[tracker.handle];
+      var move = combo.moves[index];
+      if (ig.input.pressed(move)) {
+        tracker.index = index + 1;
+      }
+      if (tracker.index >= combo.moves.length) {
+        // COMBO!
+        combo.callback();
       }
     };
 
@@ -97,8 +115,8 @@ ig.module(
     this.update = function() {
       // Did the player press any keys that we should track as possible combos?
       _.each(this.comboStarters, maybeCreateTrackers, this);
-      // Have any trackers expired?
-      _.each(this.trackers, filterExpiredTracker, this);
+      // Process the trackers.
+      _.each(this.trackers, processTracker, this);
     };
   };
 
