@@ -82,6 +82,10 @@ ig.module(
       }
     };
 
+    // Meant to execute within the context of a ComboManager instance.
+    // Given a tracker (and its ID) this method will remove it from the
+    // global list if that tracker has expired according to the
+    // ComboManager's timer.
     var filterExpiredTracker = function(tracker, trackerId) {
       var interval = this.combos[tracker.handle].interval;
       if (this.timer.delta() - tracker.timestamp > interval) {

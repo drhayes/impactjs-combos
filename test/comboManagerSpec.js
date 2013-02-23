@@ -179,7 +179,7 @@ describe('ComboManager', function() {
           expect(_.size(comboManager.trackers)).to.equal(2);
         });
 
-        it('expires old timers during update', function() {
+        it('expires old trackers during update', function() {
            // Fake the input press.
            ig.input.pressed.withArgs(moves[0]).returns(true);
            // Invoke update to create a tracker.
@@ -189,6 +189,21 @@ describe('ComboManager', function() {
            ig.input.pressed.withArgs(moves[0]).returns(false);
            comboManager.update();
            expect(_.size(comboManager.trackers)).to.equal(0);
+        });
+
+        it('should call callback if inputs match combo', function() {
+           ig.input.pressed.withArgs(moves[0]).returns(true);
+           comboManager.update();
+           ig.input.pressed.withArgs(moves[0]).returns(false);
+           ig.input.pressed.withArgs(moves[1]).returns(true);
+           comboManager.update();
+           ig.input.pressed.withArgs(moves[1]).returns(false);
+           ig.input.pressed.withArgs(moves[2]).returns(true);
+           comboManager.update();
+           ig.input.pressed.withArgs(moves[2]).returns(false);
+           ig.input.pressed.withArgs(moves[3]).returns(true);
+           comboManager.update();
+           expect(cb.called).to.be(true);
         });
       });
     });
