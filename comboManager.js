@@ -111,7 +111,6 @@ ig.module(
       // Iterate over the known actions, seeing if any were pressed.
       _.each(this.actions, updateStreamIfPressed, this);
       // Iterate over the combos checking to see if any hit.
-      var cache = {};
       _.each(this.combos, checkCombo, this);
     };
   };
