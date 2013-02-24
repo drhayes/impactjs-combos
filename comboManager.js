@@ -29,6 +29,7 @@ ig.module(
     this.actions = actions;
     this.combos = {};
     this.timer = new ig.Timer();
+    this.inputStream = [];
 
     // Register a combo with the combo manager. 'moves' is an array of inputs
     // that, pressed in succession, represent a combo. 'interval' is the time
@@ -62,59 +63,14 @@ ig.module(
       delete this.combos[handle];
     };
 
-    // Meant to execute within the context of a ComboManager instance.
-    // Given a list of combo handles and the first move for each, check
-    // if the corresponding input was pressed and, if so, create a new tracker.
-    var maybeCreateTrackers = function(handles, firstMove) {
-      if (ig.input.pressed(firstMove)) {
-        // Add a new tracker for each handle.
-        _.each(handles, function(handle) {
-          var trackerId = _.uniqueId('tracker-');
-          this.trackers[trackerId] = {
-            handle: handle,
-            timestamp: this.timer.delta()
-          };
-        }, this);
-      }
-    };
-
-    // Meant to execute within the context of a ComboManager instance.
-    // Given a tracker (and its ID) this method will remove it from the
-    // global list if that tracker has expired according to the
-    // ComboManager's timer.
-    // It will then check the tracker's current index and see if that
-    // input has been pressed. If so, the index will be advanced.
-    // If the index is greater than the length of the matching combo's moves
-    // then this combo has fired.
-    var processTracker = function(tracker, trackerId) {
-      var interval = this.combos[tracker.handle].interval;
-      if (this.timer.delta() - tracker.timestamp > interval) {
-        delete this.trackers[trackerId];
-        return;
-      }
-      var index = tracker.index;
-      if (index === void 0) {
-        index = 0;
-      }
-      var combo = this.combos[tracker.handle];
-      var move = combo.moves[index];
-      if (ig.input.pressed(move)) {
-        tracker.index = index + 1;
-      }
-      if (tracker.index >= combo.moves.length) {
-        // COMBO!
-        combo.callback();
-        // Remove the tracker; its job is done.
-        delete this.trackers[trackerId];
-      }
-    };
-
     // Call this method every frame to check for combos!
     this.update = function() {
-      // Did the player press any keys that we should track as possible combos?
-      _.each(this.comboStarters, maybeCreateTrackers, this);
-      // Process the trackers.
-      _.each(this.trackers, processTracker, this);
+      // Iterate over the known actions, seeing if any were pressed.
+      _.each(this.actions, function(action) {
+        if (ig.input.pressed(action)) {
+          this.inputStream.push(action);
+        }
+      }, this);
     };
   };
 

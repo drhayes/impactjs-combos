@@ -53,6 +53,7 @@ describe('ComboManager', function() {
       expect(cm.actions).to.be.a('array');
       expect(cm.combos).to.be.a('object');
       expect(cm.timer).to.be.a('object');
+      expect(cm.inputStream).to.be.a('array');
     });
 
     it('should intercept bind and bindTouch', function() {
@@ -139,8 +140,9 @@ describe('ComboManager', function() {
           comboManager.update();
           ig.input.pressed.withArgs('catpants').returns(false);
           ig.input.pressed.withArgs('horsepoo').returns(true);
+          comboManager.update();
           // Validate the input stream.
-          expect(comboManager.inputStream).to.equal(
+          expect(comboManager.inputStream).to.deep.equal(
             ['doggyhat', 'catpants', 'catpants', 'horsepoo']);
         });
       });
