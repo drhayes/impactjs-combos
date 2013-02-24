@@ -69,7 +69,10 @@ ig.module(
     // is currently pressed.
     var updateStreamIfPressed = function(action) {
       if (ig.input.pressed(action)) {
-        this.inputStream.push(action);
+        this.inputStream.push({
+          action: action,
+          delta: this.timer.delta()
+        });
       }
     };
 
@@ -78,8 +81,15 @@ ig.module(
     // they match the given combo. If they do, invoke the combo's
     // callback and reset the input stream so we don't get repeats.
     var checkCombo = function(combo) {
-      var slice = _.last(this.inputStream, combo.moves.length);
-      if (slice.join('|') === combo.joinedMoves) {
+      var length = combo.moves.length;
+      var slice = _.last(this.inputStream, length);
+      // Early exit if not enough input yet.
+      if (slice.length < length) {
+        return;
+      }
+      var elapsedTime = slice[length - 1].delta - slice[0].delta;
+      var joined = _.pluck(slice, 'action').join('|');
+      if (joined === combo.joinedMoves && elapsedTime <= combo.interval) {
         combo.callback();
         // Combo matched! Reset the input stream.
         this.inputStream = [];

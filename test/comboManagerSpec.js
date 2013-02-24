@@ -71,13 +71,15 @@ describe('ComboManager', function() {
     var moves = ['up', 'up', 'down', 'down'];
     var cb;
     var deltaStub;
+    var fakeTimer;
 
     beforeEach(function() {
       // Fake the timer as well.
       deltaStub = sinon.stub();
-      sinon.stub(ig, 'Timer').returns({
+      fakeTimer = {
         delta: deltaStub
-      });
+      };
+      sinon.stub(ig, 'Timer').returns(fakeTimer);
       comboManager = new ComboManager();
       cb = sinon.spy();
       // Register those moves.
@@ -144,7 +146,8 @@ describe('ComboManager', function() {
           ig.input.pressed.withArgs('horsepoo').returns(true);
           comboManager.update();
           // Validate the input stream.
-          expect(comboManager.inputStream).to.deep.equal(
+          var actions = _.pluck(comboManager.inputStream, 'action');
+          expect(actions).to.deep.equal(
             ['doggyhat', 'catpants', 'catpants', 'horsepoo']);
         });
       });
@@ -172,7 +175,18 @@ describe('ComboManager', function() {
 
         it('should call callback if inputs match combo', function() {
           doCombo();
-          expect(cb.called).to.equal(true);
+          expect(cb.called).to.be.ok;
+        });
+
+        it('should not call callback if combo took too long', function() {
+          fakeTimer.delta = function() {};
+          var counter = 0;
+          sinon.stub(fakeTimer, 'delta', function() {
+            counter += 0.3;
+            return counter;
+          });
+          doCombo();
+          expect(cb.called).to.not.be.ok;
         });
 
         it('should only call callback once on match', function() {
