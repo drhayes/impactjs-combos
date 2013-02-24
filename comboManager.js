@@ -27,7 +27,6 @@ ig.module(
 
   global.ComboManager = function() {
     this.combos = {};
-    this.comboStarters = {};
     this.trackers = {};
 
     this.timer = new ig.Timer();
@@ -47,15 +46,6 @@ ig.module(
         interval: interval,
         callback: callback
       };
-      // Track the start of the combo so we know what to check
-      // for in update.
-      var firstMove = moves[0];
-      var starters = this.comboStarters[firstMove];
-      if (!starters) {
-        starters = [];
-        this.comboStarters[firstMove] = starters;
-      }
-      starters.push(handle);
       // Return the handle for later removal.
       return handle;
     };
@@ -68,15 +58,6 @@ ig.module(
       if (!combo) {
         // Invalid handle, early exit.
         return;
-      }
-      // Deregister the combo starter.
-      var firstMove = combo.moves[0];
-      var starters = this.comboStarters[firstMove];
-      starters = _.without(starters, handle);
-      // If there are no more combos that start with this input then
-      // remove the combo starter value entirely.
-      if (starters.length === 0) {
-        delete this.comboStarters[firstMove];
       }
       // Delete the combo itself.
       delete this.combos[handle];

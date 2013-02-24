@@ -93,23 +93,6 @@ describe('ComboManager', function() {
         var handle = comboManager.add(moves, 1000, cb);
         expect(_.size(comboManager.combos)).to.equal(1);
       });
-
-      it('should track a new combo starter', function() {
-        expect(_.size(comboManager.comboStarters)).to.equal(0);
-        comboManager.add(['left'], 1000, cb);
-        expect(_.size(comboManager.comboStarters)).to.equal(1);
-        expect(comboManager.comboStarters.left).to.be.ok;
-      });
-
-      it('should track duplicate combo starters', function() {
-        expect(_.size(comboManager.comboStarters)).to.equal(0);
-        comboManager.add(['left', 'right'], 1000, cb);
-        comboManager.add(['left', 'up'], 1000, cb);
-        expect(_.size(comboManager.comboStarters)).to.equal(1);
-        expect(comboManager.comboStarters.left).to.be.ok;
-        var starters = comboManager.comboStarters.left;
-        expect(starters).to.have.length(2);
-      });
     });
 
     describe('remove', function() {
@@ -126,13 +109,6 @@ describe('ComboManager', function() {
 
       it('should not blow up if given invalid handle', function() {
         comboManager.remove('thing');
-      });
-
-      it('should stop tracking combo starter if removed', function() {
-        var handle = comboManager.add(moves, 1000, cb);
-        expect(_.size(comboManager.comboStarters)).to.equal(1);
-        comboManager.remove(handle);
-        expect(_.size(comboManager.comboStarters)).to.equal(0);
       });
     });
 
@@ -161,49 +137,6 @@ describe('ComboManager', function() {
           comboManager.update();
           // Validate that our stub was not called.
           expect(ig.input.pressed.called).to.not.be.ok;
-        });
-
-        it('should check that first move was pressed', function() {
-          // This fakes the input press.
-          ig.input.pressed.withArgs(moves[0]).returns(true);
-          // Invoke update.
-          comboManager.update();
-          // Validate that our stub was called.
-          expect(ig.input.pressed.called).to.be.ok;
-        });
-
-        it('should create a new tracker when matching the first move', function() {
-          // Fake the input press.
-          ig.input.pressed.withArgs(moves[0]).returns(true);
-          expect(_.size(comboManager.trackers)).to.equal(0);
-          // Invoke update.
-          comboManager.update();
-          // Do we have a new tracker?
-          expect(_.size(comboManager.trackers)).to.equal(1);
-        });
-
-        it('should add a tracker for each combo matched', function() {
-          // Add another combo.
-          comboManager.add([moves[0], 'jump'], interval, cb);
-          // Fake the input press.
-          ig.input.pressed.withArgs(moves[0]).returns(true);
-          expect(_.size(comboManager.trackers)).to.equal(0);
-          // Invoke update.
-          comboManager.update();
-          // Do we have a new tracker?
-          expect(_.size(comboManager.trackers)).to.equal(2);
-        });
-
-        it('expires old trackers during update', function() {
-           // Fake the input press.
-           ig.input.pressed.withArgs(moves[0]).returns(true);
-           // Invoke update to create a tracker.
-           comboManager.update();
-           expect(_.size(comboManager.trackers)).to.equal(1);
-           deltaStub.returns(interval * 2);
-           ig.input.pressed.withArgs(moves[0]).returns(false);
-           comboManager.update();
-           expect(_.size(comboManager.trackers)).to.equal(0);
         });
 
         it('should call callback if inputs match combo', function() {
