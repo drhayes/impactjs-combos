@@ -15,6 +15,12 @@ global._ = _;
 
 // Fake the Impact global namespace with good enough definitions.
 var ig = global.ig = {
+  // The ComboManager overrides bind and bindTouch, so we need to fake up
+  // the extend method on Input to verify that it is intercepting the
+  // right stuff.
+  Input: {
+    inject: sinon.stub()
+  },
   // Fake input stuff.
   input: {
     pressed: function() {}
@@ -40,6 +46,15 @@ describe('ComboManager', function() {
   describe('setup', function() {
     it('should be defined', function() {
       expect(ComboManager).to.be.a('function');
+    });
+
+    it('should intercept bind and bindTouch', function() {
+      expect(ig.Input.inject.called).to.equal(true);
+      var call = ig.Input.inject.getCall(0);
+      var definition = call.args[0];
+      // Verify that it is trying to do something with bind and bindTouch.
+      expect(definition.bind).to.be.a('function');
+      expect(definition.bindTouch).to.be.a('function');
     });
   });
 

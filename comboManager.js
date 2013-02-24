@@ -3,11 +3,27 @@ ig.module(
   'game.system.comboManager'
 )
 .requires(
-  'impact.impact'
+  'impact.impact',
+  'impact.input'
 )
 .defines((function(global) {
 
   'use strict';
+
+  var actions = [];
+
+  // Intercept calls to ig.input.bind and ig.input.bindTouch so we know what
+  // actions to look for in the ComboManager.
+  ig.Input.inject({
+    bind: function(key, action) {
+      actions.push(action);
+      this.parent(key, action);
+    },
+    bindTouch: function(selector, action) {
+      actions.push(action);
+      this.parent(selector, action);
+    }
+  });
 
   global.ComboManager = function() {
     this.combos = {};
@@ -108,6 +124,8 @@ ig.module(
       if (tracker.index >= combo.moves.length) {
         // COMBO!
         combo.callback();
+        // Remove the tracker; its job is done.
+        delete this.trackers[trackerId];
       }
     };
 
