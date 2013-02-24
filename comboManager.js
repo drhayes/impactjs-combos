@@ -73,18 +73,26 @@ ig.module(
       }
     };
 
+    // Meant to be called within context of ComboManager.
+    // Checks the last n moves in the input stream to see if
+    // they match the given combo. If they do, invoke the combo's
+    // callback and reset the input stream so we don't get repeats.
+    var checkCombo = function(combo) {
+      var slice = _.last(this.inputStream, combo.moves.length);
+      if (slice.join('|') === combo.joinedMoves) {
+        combo.callback();
+        // Combo matched! Reset the input stream.
+        this.inputStream = [];
+      }
+    };
+
     // Call this method every frame to check for combos!
     this.update = function() {
       // Iterate over the known actions, seeing if any were pressed.
       _.each(this.actions, updateStreamIfPressed, this);
       // Iterate over the combos checking to see if any hit.
       var cache = {};
-      _.each(this.combos, function(combo) {
-        var slice = _.last(this.inputStream, combo.moves.length);
-        if (slice.join('|') === combo.joinedMoves) {
-          combo.callback();
-        }
-      }, this);
+      _.each(this.combos, checkCombo, this);
     };
   };
 

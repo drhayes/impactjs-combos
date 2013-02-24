@@ -153,6 +153,16 @@ describe('ComboManager', function() {
         var handle;
         var interval;
 
+        var doCombo = function() {
+          _.each(moves, function(move, index) {
+            if (index > 0) {
+              ig.input.pressed.withArgs(moves[index - 1]).returns(false);
+            }
+            ig.input.pressed.withArgs(moves[index]).returns(true);
+            comboManager.update();
+          });
+        };
+
         beforeEach(function() {
           deltaStub.returns(0);
           interval = 0.5;
@@ -161,18 +171,15 @@ describe('ComboManager', function() {
         });
 
         it('should call callback if inputs match combo', function() {
-           ig.input.pressed.withArgs(moves[0]).returns(true);
-           comboManager.update();
-           ig.input.pressed.withArgs(moves[0]).returns(false);
-           ig.input.pressed.withArgs(moves[1]).returns(true);
-           comboManager.update();
-           ig.input.pressed.withArgs(moves[1]).returns(false);
-           ig.input.pressed.withArgs(moves[2]).returns(true);
-           comboManager.update();
-           ig.input.pressed.withArgs(moves[2]).returns(false);
-           ig.input.pressed.withArgs(moves[3]).returns(true);
-           comboManager.update();
-           expect(cb.called).to.equal(true);
+          doCombo();
+          expect(cb.called).to.equal(true);
+        });
+
+        it('should only call callback once on match', function() {
+          doCombo();
+          ig.input.pressed.withArgs(moves[moves.length - 1]).returns(false);
+          comboManager.update();
+          expect(cb.calledOnce).to.be.ok;
         });
       });
     });
