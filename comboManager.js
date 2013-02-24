@@ -26,9 +26,8 @@ ig.module(
   });
 
   global.ComboManager = function() {
+    this.actions = actions;
     this.combos = {};
-    this.trackers = {};
-
     this.timer = new ig.Timer();
 
     // Register a combo with the combo manager. 'moves' is an array of inputs

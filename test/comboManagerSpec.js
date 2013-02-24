@@ -48,6 +48,13 @@ describe('ComboManager', function() {
       expect(ComboManager).to.be.a('function');
     });
 
+    it('should have well-defined initial state', function() {
+      var cm = new ComboManager();
+      expect(cm.actions).to.be.a('array');
+      expect(cm.combos).to.be.a('object');
+      expect(cm.timer).to.be.a('object');
+    });
+
     it('should intercept bind and bindTouch', function() {
       expect(ig.Input.inject.called).to.equal(true);
       var call = ig.Input.inject.getCall(0);
@@ -117,6 +124,27 @@ describe('ComboManager', function() {
         expect(comboManager.update).to.be.a('function');
       });
 
+      describe('input tracking', function() {
+        it('should register keystrokes on update', function() {
+          // Track some actions.
+          comboManager.actions = ['catpants', 'doggyhat', 'horsepoo'];
+          ig.input.pressed = sinon.stub();
+          // Inputs interspersed with updates.
+          ig.input.pressed.withArgs('doggyhat').returns(true);
+          comboManager.update();
+          ig.input.pressed.withArgs('doggyhat').returns(false);
+          ig.input.pressed.withArgs('catpants').returns(true);
+          comboManager.update();
+          // catpants * 2
+          comboManager.update();
+          ig.input.pressed.withArgs('catpants').returns(false);
+          ig.input.pressed.withArgs('horsepoo').returns(true);
+          // Validate the input stream.
+          expect(comboManager.inputStream).to.equal(
+            ['doggyhat', 'catpants', 'catpants', 'horsepoo']);
+        });
+      });
+
       describe('with one combo', function() {
         var handle;
         var interval;
@@ -139,7 +167,7 @@ describe('ComboManager', function() {
           expect(ig.input.pressed.called).to.not.be.ok;
         });
 
-        it('should call callback if inputs match combo', function() {
+        xit('should call callback if inputs match combo', function() {
            ig.input.pressed.withArgs(moves[0]).returns(true);
            comboManager.update();
            ig.input.pressed.withArgs(moves[0]).returns(false);
