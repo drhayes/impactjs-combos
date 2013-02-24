@@ -43,6 +43,7 @@ ig.module(
       // Register the combo itself.
       this.combos[handle] = {
         moves: moves,
+        joinedMoves: moves.join('|'),
         interval: interval,
         callback: callback
       };
@@ -63,12 +64,25 @@ ig.module(
       delete this.combos[handle];
     };
 
+    // Meant to be called within context of ComboManager.
+    // Pushes the action onto the input stream if the action
+    // is currently pressed.
+    var updateStreamIfPressed = function(action) {
+      if (ig.input.pressed(action)) {
+        this.inputStream.push(action);
+      }
+    };
+
     // Call this method every frame to check for combos!
     this.update = function() {
       // Iterate over the known actions, seeing if any were pressed.
-      _.each(this.actions, function(action) {
-        if (ig.input.pressed(action)) {
-          this.inputStream.push(action);
+      _.each(this.actions, updateStreamIfPressed, this);
+      // Iterate over the combos checking to see if any hit.
+      var cache = {};
+      _.each(this.combos, function(combo) {
+        var slice = _.last(this.inputStream, combo.moves.length);
+        if (slice.join('|') === combo.joinedMoves) {
+          combo.callback();
         }
       }, this);
     };

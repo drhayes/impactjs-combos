@@ -80,6 +80,8 @@ describe('ComboManager', function() {
       });
       comboManager = new ComboManager();
       cb = sinon.spy();
+      // Register those moves.
+      comboManager.actions = _.uniq(moves);
     });
 
     afterEach(function() {
@@ -158,18 +160,7 @@ describe('ComboManager', function() {
           ig.input.pressed = sinon.stub();
         });
 
-        it('should not check if no registered combos', function() {
-          // Remove the combo registered in beforeEach.
-          // We need to make sure we're not iterating over a bunch
-          // of combo starters if no combos are registered.
-          comboManager.remove(handle);
-          // Now invoke update.
-          comboManager.update();
-          // Validate that our stub was not called.
-          expect(ig.input.pressed.called).to.not.be.ok;
-        });
-
-        xit('should call callback if inputs match combo', function() {
+        it('should call callback if inputs match combo', function() {
            ig.input.pressed.withArgs(moves[0]).returns(true);
            comboManager.update();
            ig.input.pressed.withArgs(moves[0]).returns(false);
