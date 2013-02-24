@@ -150,6 +150,23 @@ describe('ComboManager', function() {
           expect(actions).to.deep.equal(
             ['doggyhat', 'catpants', 'catpants', 'horsepoo']);
         });
+
+        it('should not grow unboundedly', function() {
+          // Track some actions.
+          comboManager.actions = ['catpants', 'doggyhat', 'horsepoo'];
+          // Invent a max size.
+          comboManager.comboMaxSize = 6;
+          ig.input.pressed = sinon.stub();
+          var lotsOfActions = _.map(_.range(600), function(i) {
+            return comboManager.actions[i % comboManager.actions.length];
+          });
+          _.each(lotsOfActions, function(action) {
+            ig.input.pressed.withArgs(action).returns(true);
+            comboManager.update();
+            ig.input.pressed.withArgs(action).returns(false);
+          });
+          expect(comboManager.inputStream).to.have.length.below(101);
+        });
       });
 
       describe('with one combo', function() {

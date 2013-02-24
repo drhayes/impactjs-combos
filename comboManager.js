@@ -10,6 +10,10 @@ ig.module(
 
   'use strict';
 
+  // When the input stream gets this big, cut it down to the
+  // maximum size of the biggest combo.
+  var INPUT_STREAM_THRESHOLD = 100;
+
   var actions = [];
 
   // Intercept calls to ig.input.bind and ig.input.bindTouch so we know what
@@ -30,6 +34,7 @@ ig.module(
     this.combos = {};
     this.timer = new ig.Timer();
     this.inputStream = [];
+    this.comboMaxSize = 2;
 
     // Register a combo with the combo manager. 'moves' is an array of inputs
     // that, pressed in succession, represent a combo. 'interval' is the time
@@ -47,6 +52,7 @@ ig.module(
         interval: interval,
         callback: callback
       };
+      this.comboMaxSize = Math.max(this.comboMaxSize, moves.length);
       // Return the handle for later removal.
       return handle;
     };
@@ -73,6 +79,10 @@ ig.module(
           action: action,
           delta: this.timer.delta()
         });
+      }
+      // Is the stream too big?
+      if (this.inputStream.length > INPUT_STREAM_THRESHOLD) {
+        this.inputStream = this.inputStream.slice(-this.comboMaxSize);
       }
     };
 
